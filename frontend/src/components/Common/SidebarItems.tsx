@@ -1,60 +1,69 @@
 import { Box, Flex, Icon, Text } from "@chakra-ui/react"
-import { useQueryClient } from "@tanstack/react-query"
-import { Link as RouterLink } from "@tanstack/react-router"
-import { FiBriefcase, FiHome, FiSettings, FiUsers } from "react-icons/fi"
-import type { IconType } from "react-icons/lib"
-
-import type { UserPublic } from "@/client"
-
-const items = [
-  { icon: FiHome, title: "Dashboard", path: "/" },
-  { icon: FiBriefcase, title: "Items", path: "/items" },
-  { icon: FiSettings, title: "User Settings", path: "/settings" },
-]
+import { useState } from "react"
+import AddIcon from '@mui/icons-material/Add'
+import SearchIcon from '@mui/icons-material/Search'
+import CreateIcon from '@mui/icons-material/Create'
+import MenuIcon from '@mui/icons-material/Menu'
 
 interface SidebarItemsProps {
   onClose?: () => void
+  onToggleSidebar?: () => void
 }
 
-interface Item {
-  icon: IconType
-  title: string
-  path: string
-}
-
-const SidebarItems = ({ onClose }: SidebarItemsProps) => {
-  const queryClient = useQueryClient()
-  const currentUser = queryClient.getQueryData<UserPublic>(["currentUser"])
-
-  const finalItems: Item[] = currentUser?.is_superuser
-    ? [...items, { icon: FiUsers, title: "Admin", path: "/admin" }]
-    : items
-
-  const listItems = finalItems.map(({ icon, title, path }) => (
-    <RouterLink key={title} to={path} onClick={onClose}>
-      <Flex
-        gap={4}
-        px={4}
-        py={2}
-        _hover={{
-          background: "gray.subtle",
-        }}
-        alignItems="center"
-        fontSize="sm"
-      >
-        <Icon as={icon} alignSelf="center" />
-        <Text ml={2}>{title}</Text>
-      </Flex>
-    </RouterLink>
-  ))
+const SidebarItems = ({ onClose, onToggleSidebar }: SidebarItemsProps) => {
+  const [searchOpen, setSearchOpen] = useState(false)
 
   return (
-    <>
-      <Text fontSize="xs" px={4} py={2} fontWeight="bold">
-        Menu
-      </Text>
-      <Box>{listItems}</Box>
-    </>
+    <Box>
+      <Box p={2}>
+        {/* 頂部工具欄 */}
+        <Flex mt={4} justify="space-between" align="center" px={1}>
+          {/* 左側 Menu Icon */}
+          <Icon 
+            as={MenuIcon} 
+            boxSize={6} 
+            cursor="pointer"
+            onClick={onToggleSidebar}
+            _hover={{ color: "gray.600" }}
+          />
+          
+          {/* 右側圖標組 */}
+          <Flex gap={3}>
+            <Icon 
+              as={SearchIcon} 
+              boxSize={6} 
+              cursor="pointer"
+              onClick={() => setSearchOpen(true)}
+              _hover={{ color: "gray.600" }}
+            />
+            <Icon 
+              as={AddIcon} 
+              boxSize={6} 
+              cursor="pointer"
+              onClick={onClose}
+              _hover={{ color: "gray.600" }}
+            />
+          </Flex>
+        </Flex>
+
+        {/* 這裡可以放置歷史對話列表 */}
+        <Box mt={4}>
+          {/* 歷史對話將在這裡渲染 */}
+        </Box>
+      </Box>
+      <Flex 
+        p={4} 
+        borderBottom="1px" 
+        borderColor="gray.200"
+        alignItems="center"
+        gap={2}
+        cursor="pointer"
+        onClick={onClose}
+      >
+        <Icon as={CreateIcon} boxSize={6} />
+        <Text fontSize="md" fontWeight="medium">AnyTimeSum</Text>
+      </Flex>
+    </Box>
   )
 }
 
